@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hacken...</title>
+<style>
+  body {
+    background-color: black;
+    color: limegreen;
+    font-family: monospace;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  .container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    padding: 20px;
+  }
+  .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 16px;
+    background-color: limegreen;
+    animation: blink 0.8s infinite;
+  }
+  @keyframes blink {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+  .input-container {
+    margin-top: 20px;
+  }
+  input[type="text"] {
+    background-color: #333;
+    color: limegreen;
+    border: none;
+    padding: 10px;
+    font-family: monospace;
+    border-radius: 5px;
+    outline: none;
+  }
+  input[type="submit"] {
+    background-color: limegreen;
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    font-family: monospace;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  input[type="submit"]:hover {
+    background-color: darkgreen;
+  }
+  .console {
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #333;
+    border-radius: 5px;
+    white-space: pre-wrap;
+    text-align: left;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  .console p {
+    margin: 0;
+    color: limegreen; /* Om de tekst in de console wit te maken */
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <pre id="ascii-art">
+  _______   _    _   _______   _        _   _______   _______   ______  
+ |__   __| | |  | | |__   __| | |      | | |__   __| |__   __| |  ____| 
+    | |    | |__| |    | |    | |      | |    | |       | |    | |____  
+    | |    |  __  |    | |    | |      | |    | |       | |    |  ____| 
+    | |    | |  | |    | |    | |______| |    | |    ___| |    | |____  
+    |_|    |_|  |_|    |_|    |__________|    |_|   |_____|    |______| 
+    </pre>
+    <p id="access-granted">Bezig met inloggen...<span class="cursor"></span></p>
+    <div id="input-container" class="input-container" style="display: none;">
+      <input type="text" id="user-input" placeholder="Typ hier...">
+      <input type="submit" id="submit-button" value="Versturen">
+    </div>
+    <div id="console" class="console"></div>
+  </div>
+<script>
+  setTimeout(function() {
+    document.getElementById('access-granted').innerText = 'Access Granted';
+    document.getElementById('input-container').style.display = 'block';
+  }, 3000); // Na 3 seconden toegang verlenen
+
+  // Functie om de ingevoerde tekst te verwerken en weer te geven in de console
+  function processInput() {
+    const userInput = document.getElementById('user-input').value;
+    const consoleInput = document.createElement('p');
+    consoleInput.innerText = '> ' + userInput;
+    document.getElementById('console').appendChild(consoleInput);
+
+    if (userInput.toLowerCase() === "wiggle") {
+      wiggleAsciiArt();
+    } else {
+      try {
+        const output = eval(userInput);
+        if (output !== undefined) {
+          const outputElement = document.createElement('p');
+          outputElement.innerText = '> ' + output;
+          document.getElementById('console').appendChild(outputElement);
+        }
+      } catch (error) {
+        const errorElement = document.createElement('p');
+        errorElement.innerText = '> Error: ' + error.message;
+        document.getElementById('console').appendChild(errorElement);
+      }
+    }
+
+    // Scroll naar beneden om de laatste toegevoegde tekst te tonen
+    document.getElementById('console').scrollTop = document.getElementById('console').scrollHeight;
+
+    document.getElementById('user-input').value = '';
+  }
+
+  // Event listener voor het klikken op de versturen knop
+  document.getElementById('submit-button').addEventListener('click', processInput);
+
+  // Event listener voor het indrukken van Enter in het invoerveld
+  document.getElementById('user-input').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+      processInput();
+    }
+  });
+
+  // Functie om het ASCII-art te laten bewegen
+  function wiggleAsciiArt() {
+    const asciiArt = document.getElementById('ascii-art');
+    const startTime = Date.now();
+
+    function animate() {
+      const elapsedTime = Date.now() - startTime;
+      const xOffset = Math.sin(elapsedTime / 100) * 10;
+      const yOffset = Math.cos(elapsedTime / 100) * 5;
+      asciiArt.style.transform = `translate(${xOffset}px, ${yOffset}px)`;
+
+      if (elapsedTime < 5000) {
+        requestAnimationFrame(animate);
+      } else {
+        asciiArt.style.transform = 'translate(0, 0)';
+      }
+    }
+
+    animate();
+  }
+</script>
+</body>
+</html>
